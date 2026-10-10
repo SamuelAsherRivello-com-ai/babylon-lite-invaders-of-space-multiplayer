@@ -2,6 +2,8 @@
 
 A pixel-art invasion game for one to four pilots. Hold the line against descending alien waves, share the sky, and survive on three personal lives.
 
+![Four pilots defending the invasion line](docs/screenshot01.png)
+
 ## Live Demo
 
 Publication is in progress. The multiplayer relay must pass its free Vercel Hobby deployment checks before the game is released to GitHub Pages.
@@ -57,6 +59,9 @@ The ships, alien animation frames, shots, stars, armor, and hit effects are orig
 ## Project Details
 
 - [Game design](docs/game-design.md) describes rules, presentation, and multiplayer responsibilities.
+- [Completed creation template](docs/game-creation-brief.md) records the brief used for this game.
+- [Verification evidence](docs/verification.md) includes reproducible browser checks and disclosed device coverage.
+- [Template delivery audit](docs/template-audit.md) records checklist outcomes.
 - [Template and shared-skills provenance](docs/skills-import.md) records the source revisions and workflow setup.
 - `space-invaders/src/content/game/` contains deterministic rules, input, session coordination, and the Babylon Lite renderer.
 - `space-invaders/test/` contains rule, input, session, shell, and rendering-policy checks.

@@ -22,7 +22,7 @@ Resize verification in Edge confirmed 640×1152 at integer 2× for a 1920×1200 
 
 The complete shared-server suite passed all 134 tests under Node 24.21.0 after the admission fix. Client packaging, documentation validation and TypeScript checks also passed.
 
-The actual game simulation also completed wave clear, personal three-life elimination, spectator survivor continuation, team defeat and automatic wave-one replay over the staged public relay in 30.185 seconds. Migration after a committed personal death preserved the life record and private-token rejoin restored the same seat. This is network/session evidence, separate from the pending WebGPU cooperative browser gameplay check.
+The actual game simulation also completed wave clear, personal three-life elimination, spectator survivor continuation, team defeat and automatic wave-one replay over the staged public relay in 30.185 seconds. Migration after a committed personal death preserved the life record and private-token rejoin restored the same seat. This is network/session evidence, separate from the WebGPU cooperative browser checks documented here.
 
 With ordered WebSocket impairment configured as 100 ms each way and ±50 ms jitter, the actual networked simulation completed the same full loop plus committed-death migration and recovery in 59.556 seconds. Across 13,184 delayed messages, measured one-way delay was 51.39–258.00 ms, mean 126.93 ms (including host scheduling stalls and ordered queuing). This does not substitute for the browser prediction/interpolation visual check.
 
@@ -37,3 +37,26 @@ Mobile touch emulation at 390×844 passed concurrent direction/fire, releasing d
 The extended delayed-browser run also passed spectator hosting: the eliminated pilot took authority in 3.175 seconds, stayed eliminated, and continued simulating for the survivor. The earlier handoff in this run took 3.817 seconds, including configured network impairment. The returning old host stayed a guest. The full loop, both handoffs and replay completed in 50.776 seconds with no page errors.
 
 An intentionally stalled adapter request produced the graphics timeout/retry state after fifteen seconds; retry obtained the real hardware adapter and displayed the game. Desktop 125% zoom was emulated with a 1024×576 CSS viewport and DPR 1.25: the logical world stayed 320×576, the backing surface became 400×720, and the page stayed within its viewport. Settings remained reachable. This is zoom emulation, separate from physical browser UI zoom and physical fractional-DPR hardware.
+
+## Reproduce browser verification
+
+The checked-in callbacks use Playwright CLI with a headed WebGPU-capable browser. Start the local game on the recorded port before local checks. The callbacks open independent browser contexts, drive actual controls, and close their own contexts. Local gameplay inspection is read-only and omitted from production.
+
+```sh
+playwright-cli -s=invaders open about:blank --browser=msedge --headed
+playwright-cli -s=invaders run-code --filename=scripts/verification/gameplay.js
+playwright-cli -s=invaders eval 'window.__browserEvidence'
+playwright-cli -s=invaders run-code --filename=scripts/verification/touch-and-motion.js
+playwright-cli -s=invaders run-code --filename=scripts/verification/graphics-and-zoom.js
+node scripts/verification/generate-latency.mjs
+playwright-cli -s=invaders run-code --filename=.implementation/latency-browser-gameplay.js
+playwright-cli -s=invaders run-code --filename=.implementation/latency-touch-and-motion.js
+node scripts/verification/generate-public.mjs
+playwright-cli -s=invaders run-code --filename=.implementation/public-browser-gameplay.js
+```
+
+The public two-client callback observes received WebSocket frames without a production debug API. It checks wave clear, spectator continuation, both living and spectator host handoffs, refresh recovery, team defeat, automatic replay and cross-client agreement. Browser resource limits can affect how many simultaneous WebGPU contexts one test machine can initialize; separate physical machines are not represented by a single GPU's context limit.
+
+Before publication, this passive-observation callback passed the complete loop against the staged relay using the local browser client in 78.130 seconds. Living-host and spectator-host handoffs took 3.366 and 2.911 seconds, respectively. Both clients agreed on the new run, wave one, score zero, combat phase and restored lives. This establishes the verifier's behavior; it does not claim the GitHub Pages deployment has been tested yet.
+
+Shared-server release run `38084815998` passed all local checks but encountered intermittent public Bomberman, Combat and Ring Rivals failures. A focused repeat against its same staged deployment passed all four affected integration tests. The deployment gate now retains both attempt logs and permits one failed-test rerun; every assertion must pass before promotion. A permanent-failure fixture verified that rerunning cannot turn an enduring assertion failure into success. No assertion or compatibility test was removed.
