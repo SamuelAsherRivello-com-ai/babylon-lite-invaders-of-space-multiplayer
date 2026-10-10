@@ -1,12 +1,12 @@
 {
-  "name": "github-repository-template",
+  "name": "babylon-lite-space-invaders-clone",
   "private": true,
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "test": "node --test --test-isolation=none project-name/test/page.test.mjs project-name/test/content.test.mjs"
+    "test": "node --test --test-isolation=none space-invaders/test/*.test.mjs"
   },
   "dependencies": {
     "@babylonjs/lite": "1.32.0",
