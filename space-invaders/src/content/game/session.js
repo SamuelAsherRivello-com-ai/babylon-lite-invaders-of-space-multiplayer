@@ -44,23 +44,24 @@ export class GameSession {
       try {
         const w=restoreWorld(transfer.state.state);
         this.previous=this.latest;this.latest={world:w,at:performance.now()};
-        const p=w.players.find(p=>p.id===s.seat);
-        if(p){
-          if(this.predictedX===null||!p.lives||p.respawn>0)this.predictedX=p.x;
-          // Reapply only local intents not yet acknowledged by the host.
-          this.inputHistory=this.inputHistory.filter(command=>command.sequence>(p.inputSequence||0));
-          const now=performance.now();let target=p.x;
-          for(let i=0;i<this.inputHistory.length;i++){
-            const command=this.inputHistory[i],end=this.inputHistory[i+1]?.at??now;
-            const duration=Math.max(0,end-Math.max(command.at,now-300));
-            target=clampX(target+command.move*duration*.148);
-          }
-          this.correction=target-this.predictedX;
-        }
+        this.reconcileLocal(w,performance.now());
       }catch(error){this.error=error.message;}
     }
     if(event==='status'&&s.status!=='connected'){this.intent={move:0,fire:false};this.world=null;this.epoch=0;this.pending.clear();this.inputHistory=[];}
     this.changed();
+  }
+  reconcileLocal(world,now) {
+    const p=world.players.find(p=>p.id===this.state.seat);if(!p)return;
+    if(this.predictedX===null||!p.lives||p.respawn>0||world.phase!=='combat')this.predictedX=p.x;
+    // Presentation predicts only unacknowledged elapsed input; it never changes rules.
+    this.inputHistory=this.inputHistory.filter(command=>command.sequence>(p.inputSequence||0));
+    let target=p.x;
+    for(let i=0;i<this.inputHistory.length;i++){
+      const command=this.inputHistory[i],end=this.inputHistory[i+1]?.at??now;
+      const duration=Math.max(0,end-Math.max(command.at,now-300));
+      target=clampX(target+command.move*duration*.148);
+    }
+    this.correction=target-this.predictedX;
   }
   setIntent(value){if(value.fire&&!this.intent.fire)this.flashUntil=performance.now()+90;this.intent={...value};this.sendInput();this.changed();}
   send(type,payload){this.client.send('action',{epoch:this.state.epoch,runId:this.state.runId,sequence:++this.sequence,type,payload});}
@@ -70,7 +71,7 @@ export class GameSession {
     if(this.closed)return;
     const now=performance.now();const delta=Math.min(100,now-this.lastTime);this.lastTime=now;
     if(this.state.status!=='connected')return;
-    if(now>=this.nextInput){this.nextInput=now+50;this.sendInput();}
+    if(now>=this.nextInput&&!document.hidden){this.nextInput=now+50;this.sendInput();}
     if(this.isHost&&this.world&&this.state.ready&&!this.error&&!document.hidden) {
       try{
         for(const a of [...this.pending.values()].sort((a,b)=>a.sequence-b.sequence))applyAction(this.world,a);
@@ -84,8 +85,11 @@ export class GameSession {
           this.client.send('hostSnapshot',checkpoint);
         }
       }catch(error){this.error=error.message;}
-    }else if(!this.isHost&&this.latest){
-      const p=this.latest.world.players.find(p=>p.id===this.state.seat);
+    }
+    if(this.isHost&&this.world)this.reconcileLocal(this.world,now);
+    const source=this.isHost?this.world:this.latest?.world;
+    if(source){
+      const p=source.players.find(p=>p.id===this.state.seat);
       if(p&&p.lives>0&&p.respawn<=0&&this.state.ready){
         this.predictedX=clampX((this.predictedX??p.x)+this.intent.move*148*delta/1000);
         if(Number.isFinite(this.correction)){const shift=Math.max(-1.5,Math.min(1.5,this.correction*.15));this.predictedX=clampX(this.predictedX+shift);this.correction-=shift;}
@@ -94,9 +98,9 @@ export class GameSession {
     if(now-this.lastUi>=50){this.lastUi=now;this.changed();}
   }
   getFrame(now=performance.now()) {
-    if(this.isHost&&this.world)return this.world;
-    if(!this.latest)return this.preview;
-    const next=this.latest.world,prior=this.previous;
+    const next=this.isHost?this.world:this.latest?.world;
+    if(!next)return this.preview;
+    const prior=this.isHost?null:this.previous;
     const frame={...next,aliens:next.aliens.map(a=>({...a})),shots:next.shots.map(s=>({...s})),players:next.players.map(p=>({...p}))};
     // One snapshot of display delay; no rendered value feeds authoritative rules.
     if(prior&&prior.world.run===next.run){

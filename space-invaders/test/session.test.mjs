@@ -31,14 +31,15 @@ test('missing migration checkpoint produces recovery error rather than a reset',
   assert.equal(session.world,null);assert.match(session.error,/No committed checkpoint/);assert.equal(client.sent.length,0);
  }finally{session?.close();restore();}
 });
-test('guest movement responds before a delayed acknowledgement and disconnect tears down its loop',()=>{
+for(const hosting of [false,true])test(`${hosting?'host':'guest'} movement responds before a delayed acknowledgement and disconnect tears down its loop`,()=>{
  const restore=context();let session;
  try{
   const w=createWorld();applyAction(w,{sequence:1,sender:'guest',type:'membership',payload:{number:1,connected:true}});startRun(w);
-  const client=new FakeClient({status:'connected',sessionId:'g',seat:'guest',hostId:'h',epoch:1,ready:true,runId:'room',transfer:{state:{state:packWorld(w)}}});
+  const client=new FakeClient({status:'connected',sessionId:'g',seat:'guest',hostId:hosting?'g':'h',epoch:1,ready:true,runId:'room',transfer:{state:{state:packWorld(w)}}});
   session=new GameSession(client);client.emit('snapshot',{});session.setIntent({move:1,fire:true});
   const before=session.getFrame().players[0].x;session.lastTime=performance.now()-16;session.update();
   assert.ok(session.getFrame().players[0].x>before,'movement waited for the server');
+  if(hosting)assert.equal(session.world.players[0].x,before,'prediction mutated the authoritative world');
   assert.ok(client.sent.some(v=>v.type==='action'&&v.value.payload.fire));
   session.close();assert.equal(client.disconnected,true);assert.equal(client.listener,null);
  }finally{session?.close();restore();}

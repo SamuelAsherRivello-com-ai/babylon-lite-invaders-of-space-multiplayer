@@ -24,7 +24,7 @@ export function Content({ createClient }) {
   const current=session.current,state=current?.state,connected=state?.status==='connected';
   const world=current?.getFrame()||preview,local=world.players.find(p=>p.id===state?.seat);
   const error=current?.error||state?.error||'';
-  useEffect(()=>{input.enable(Boolean(connected&&state.ready&&local?.lives>0&&world.phase==='combat'&&!paused&&!error));},[input,connected,state?.ready,local?.lives,world.phase,paused,error]);
+  useEffect(()=>{input.enable(Boolean(graphics&&connected&&state.ready&&local?.lives>0&&world.phase==='combat'&&!paused&&!error));},[input,graphics,connected,state?.ready,local?.lives,world.phase,paused,error]);
   async function join(create=false,room=code) {
     if(joining.current||!createClient)return;
     room=room.trim().toUpperCase();
@@ -40,6 +40,7 @@ export function Content({ createClient }) {
     finally{joining.current=false;if(mounted.current)refresh(n=>n+1);}
   }
   const autoJoined=useRef(false);
+  useEffect(()=>{if(connected&&state.code){autoJoined.current=true;const url=new URL(location.href);url.searchParams.set('room',state.code);history.replaceState(null,'',url);}},[connected,state?.code]);
   useEffect(()=>{if(graphics&&createClient&&linked&&!autoJoined.current){autoJoined.current=true;void join(false,linked);}},[graphics,createClient,linked]);
   function leave(){input.release();current?.close();session.current=null;setNotice('');refresh(n=>n+1);const url=new URL(location.href);url.searchParams.delete('room');history.replaceState(null,'',url);}
   async function share(){const url=new URL(location.href);url.searchParams.set('room',state.code);try{await navigator.clipboard.writeText(url.toString());setNotice('Invite link copied.');}catch{setNotice('Share this room code: '+state.code);}}

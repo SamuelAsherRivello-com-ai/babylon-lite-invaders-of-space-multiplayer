@@ -38,7 +38,7 @@ Vite serves the app beneath `/babylon-lite-space-invaders-clone/`; the productio
 
 ## Multiplayer
 
-The host browser simulates the world at 60 Hz. The [shared Colyseus server](https://github.com/SamuelAsherRivello/rmc-colyseus-multiplayer-server) handles private admission, ordered actions, checkpoints, and host election. It does not simulate movement, combat, lives, or waves. Guests predict local movement and interpolate remote snapshots; authoritative outcomes always come from the participant host.
+The host browser simulates the world at 60 Hz. The [shared Colyseus server](https://github.com/SamuelAsherRivello/rmc-colyseus-multiplayer-server) handles private admission, ordered actions, checkpoints, and host election. It does not simulate movement, combat, lives, or waves. Every pilot predicts local movement; guests interpolate remote snapshots. Authoritative outcomes always come from the participant host.
 
 Intentional departure frees a seat. A dropped connection reserves it for fifteen seconds. Rejoining with the private token restores the same life record, including elimination; it does not grant extra lives. Spectators occupy a seat and can host the simulation. Browser storage loss loses anonymous identity proof. Rooms expire fifteen seconds after the last connection leaves.
 
@@ -63,7 +63,7 @@ The ships, alien animation frames, shots, stars, armor, and hit effects are orig
 
 ## Original AI Prompt
 
-Source URL: [{original-ai-prompt-url}]({original-ai-prompt-url}) — unavailable and unverified; the actual initiating request is preserved below.
+Original prompt source URL: unavailable and unverified. The actual initiating request is preserved below.
 
 <details>
 <summary>Original request and supplied template</summary>

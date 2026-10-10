@@ -34,7 +34,7 @@ Late/stale hosts cannot overwrite it. A missing checkpoint gives a recovery
 error. A hidden browser withholds heartbeats to yield to a visible participant.
 Settings release local controls while shared simulation continues.
 
-Guests predict their horizontal ship immediately, reconcile against acknowledged
+Every pilot predicts their horizontal ship immediately, reconciles against acknowledged
 input, and interpolate remote state. Cosmetic muzzle feedback is local; all
 damage and wave outcomes come from the elected host. Simulation coordinates
 remain fractional; displayed anchors snap through the pixel-grid helper.
