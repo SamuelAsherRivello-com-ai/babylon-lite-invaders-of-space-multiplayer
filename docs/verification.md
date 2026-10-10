@@ -21,3 +21,7 @@ Physical touch devices have not been tested. Touch emulation and independent-poi
 Resize verification in Edge confirmed 640×1152 at integer 2× for a 1920×1200 window; proportional 266.66×480 CSS fit for 320×480; and 320×576 at 1× for 1280×720. A simulated DPR change from 1 to 1.5 changed backing width from 320 to 480 once. Fullscreen entry/exit through settings succeeded. These checks preserve fixed world framing; physical fractional-DPR displays and physical touch hardware remain untested.
 
 The complete shared-server suite passed all 134 tests under Node 24.21.0 after the admission fix. Client packaging, documentation validation and TypeScript checks also passed.
+
+The actual game simulation also completed wave clear, personal three-life elimination, spectator survivor continuation, team defeat and automatic wave-one replay over the staged public relay in 30.185 seconds. Migration after a committed personal death preserved the life record and private-token rejoin restored the same seat. This is network/session evidence, separate from the pending WebGPU cooperative browser gameplay check.
+
+With ordered WebSocket impairment configured as 100 ms each way and ±50 ms jitter, the actual networked simulation completed the same full loop plus committed-death migration and recovery in 59.556 seconds. Across 13,184 delayed messages, measured one-way delay was 51.39–258.00 ms, mean 126.93 ms (including host scheduling stalls and ordered queuing). This does not substitute for the browser prediction/interpolation visual check.

@@ -13,3 +13,7 @@ test('keyboard and touch controls compose, opposite directions cancel, focus rel
   c.pointer(9,'right',false);c.key('fire',true);assert.deepEqual(c.value,{move:-1,fire:true});
   c.release();assert.deepEqual(c.value,{move:0,fire:false});
 });
+
+test('controls pressed while disabled cannot become held when a menu closes',()=>{
+ const input=new InputController(()=>{});input.key('fire',true);input.enable(false);input.key('right',true);input.pointer(4,'fire',true);input.enable(true);assert.deepEqual(input.value,{move:0,fire:false});assert.equal(input.keys.size,0);assert.equal(input.pointers.size,0);
+});

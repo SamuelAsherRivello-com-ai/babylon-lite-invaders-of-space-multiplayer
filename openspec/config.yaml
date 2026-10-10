@@ -1,32 +1,8 @@
 schema: spec-driven
 
-# Project context (optional)
-# Add only constraints that should guide OpenSpec artifacts and workflows.
-# Include constraints an agent cannot infer by reading the code.
-# Keep general project documentation and discoverable codebase facts out.
-# Example:
-#   context: |
-#     Designs and tasks must cover Windows, macOS, and Linux
-#     Write all artifacts in Spanish
-
-# Per-artifact rules (optional)
-# Add custom rules for specific artifacts.
-# Example:
-#   rules:
-#     proposal:
-#       - Keep proposals under 500 words
-#       - Always state what is out of scope
-#     tasks:
-#       - Break tasks into chunks of max 2 hours
-
-# Per-operation guidance (optional)
-# Add advisory guidance for how apply and archive work should be conducted.
-# This is separate from artifact rules above.
-# Example:
-#   operations:
-#     apply:
-#       guidance:
-#         - Keep test summaries concise
-#     archive:
-#       guidance:
-#         - Summarize the archive outcome before finishing
+context: |
+  This project must use the existing free Vercel Hobby plan for its shared relay; do not introduce paid features or alternative hosting providers.
+  The browser participant host owns game simulation. The server handles only admission, ordered actions, checkpoints and host election.
+  The user's final concept is cooperative descending aliens inspired by Space Invaders, with no asteroid fracture mechanics.
+  Each participant has three personal lives across waves, spectates on elimination, and rejoins the shared wave-one replay after team defeat.
+  The user has authorized implementation, commits, releases and live-demo publication; preserve unrelated changes and use the default branch.

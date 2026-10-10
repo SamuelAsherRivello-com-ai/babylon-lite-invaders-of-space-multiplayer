@@ -6,14 +6,14 @@ export class InputController {
     const value=this.enabled?{move:Number(held.has('right'))-Number(held.has('left')),fire:held.has('fire')}:{move:0,fire:false};
     if(value.move!==this.value.move||value.fire!==this.value.fire){this.value=value;this.changed({...value});}
   }
-  key(action,pressed){if(pressed)this.keys.add(action);else this.keys.delete(action);this.publish();}
-  pointer(id,action,pressed){if(pressed)this.pointers.set(id,action);else this.pointers.delete(id);this.publish();}
+  key(action,pressed){if(pressed&&!this.enabled)return;if(pressed)this.keys.add(action);else this.keys.delete(action);this.publish();}
+  pointer(id,action,pressed){if(pressed&&!this.enabled)return;if(pressed)this.pointers.set(id,action);else this.pointers.delete(id);this.publish();}
   release(){this.keys.clear();this.pointers.clear();this.publish();}
   enable(value){this.enabled=value;if(!value)this.release();this.publish();}
   bind(target=window,doc=document) {
     const actions={ArrowLeft:'left',a:'left',A:'left',ArrowRight:'right',d:'right',D:'right',' ':'fire'};
-    const down=e=>{const action=actions[e.key];if(!action||/input|textarea|select/i.test(e.target?.tagName))return;e.preventDefault();this.key(action,true);};
-    const up=e=>{const action=actions[e.key];if(action){e.preventDefault();this.key(action,false);}};
+    const down=e=>{const action=actions[e.key];if(!this.enabled||!action||/input|textarea|select/i.test(e.target?.tagName))return;e.preventDefault();this.key(action,true);};
+    const up=e=>{const action=actions[e.key];if(action&&this.keys.has(action)){e.preventDefault();this.key(action,false);}};
     const release=()=>this.release();const visibility=()=>{if(doc.hidden)this.release();};
     target.addEventListener('keydown',down);target.addEventListener('keyup',up);target.addEventListener('blur',release);doc.addEventListener('visibilitychange',visibility);
     return()=>{target.removeEventListener('keydown',down);target.removeEventListener('keyup',up);target.removeEventListener('blur',release);doc.removeEventListener('visibilitychange',visibility);this.release();};

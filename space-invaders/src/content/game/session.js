@@ -4,7 +4,7 @@ import { createWorld, formation, applyAction, step, STEP_MS, clampX, packWorld, 
 export class GameSession {
   constructor(client, changed = () => {}) {
     this.client=client;this.changed=changed;this.world=null;this.latest=null;this.previous=null;
-    this.epoch=0;this.intent={move:0,fire:false};this.sequence=0;this.predictedX=null;
+    this.epoch=0;this.intent={move:0,fire:false};this.sequence=0;this.predictedX=null;this.inputHistory=[];
     this.error='';this.pending=new Map();this.lastTime=performance.now();this.accumulator=0;this.nextInput=0;this.nextSnapshot=0;this.lastUi=0;this.closed=false;
     this.preview=createWorld();formation(this.preview);
     this.wrappedRooms=new WeakSet();
@@ -48,17 +48,23 @@ export class GameSession {
         if(p){
           if(this.predictedX===null||!p.lives||p.respawn>0)this.predictedX=p.x;
           // Reapply only local intents not yet acknowledged by the host.
-          const outstanding=Math.max(0,this.sequence-(p.inputSequence||0));
-          this.correction=clampX(p.x+this.intent.move*Math.min(300,outstanding*50)*.148)-this.predictedX;
+          this.inputHistory=this.inputHistory.filter(command=>command.sequence>(p.inputSequence||0));
+          const now=performance.now();let target=p.x;
+          for(let i=0;i<this.inputHistory.length;i++){
+            const command=this.inputHistory[i],end=this.inputHistory[i+1]?.at??now;
+            const duration=Math.max(0,end-Math.max(command.at,now-300));
+            target=clampX(target+command.move*duration*.148);
+          }
+          this.correction=target-this.predictedX;
         }
       }catch(error){this.error=error.message;}
     }
-    if(event==='status'&&s.status!=='connected'){this.intent={move:0,fire:false};this.world=null;this.epoch=0;this.pending.clear();}
+    if(event==='status'&&s.status!=='connected'){this.intent={move:0,fire:false};this.world=null;this.epoch=0;this.pending.clear();this.inputHistory=[];}
     this.changed();
   }
   setIntent(value){if(value.fire&&!this.intent.fire)this.flashUntil=performance.now()+90;this.intent={...value};this.sendInput();this.changed();}
   send(type,payload){this.client.send('action',{epoch:this.state.epoch,runId:this.state.runId,sequence:++this.sequence,type,payload});}
-  sendInput(){if(this.state.ready&&this.state.status==='connected'&&!this.error)this.send('input',this.intent);}
+  sendInput(){if(this.state.ready&&this.state.status==='connected'&&!this.error){this.send('input',this.intent);this.inputHistory.push({sequence:this.sequence,at:performance.now(),move:this.intent.move});this.inputHistory=this.inputHistory.slice(-32);}}
   start(){if(this.isHost)this.send('start',{});}
   update() {
     if(this.closed)return;

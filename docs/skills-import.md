@@ -18,3 +18,11 @@ Game rendering: Babylon Lite WebGPU, fixed 320×576 portrait. Four corner roles
 are title, repository, settings and version. Root commands are npm ci, npm test,
 npm run build and npm run dev. Template showcase specifications describe the
 source template; game delta requirements replace the showcase content only.
+
+## Template delivery audit (in progress)
+
+The application root, Vite base, npm commands, original prompt disclosure, source link, portrait framing, corner roles, version file and generated-output exclusions are adapted. The `project-name` strings retained in historical OpenSpec archives, imported skills and the reusable template checklist are historical examples, not active application paths. CONTRIBUTING now uses the real application root. Unused showcase artwork, components, preferences and render presets have been removed.
+
+GitHub template generation supplied one bootstrap commit named `Initial commit` (lowercase c), rather than the checklist's `Initial Commit`. Its identity and one-commit history were recorded before adaptation. This difference is disclosed; task-specific history is not rewritten. No original-prompt source URL was supplied, so that link remains explicitly unverified. The full shared skill import follows the invoked create-game skill's explicit requirement; no global skills were changed.
+
+Public game release, final screenshots, repository About website, physical-device coverage and final local/remote alignment remain delivery checks. No unverified item is presented as complete.

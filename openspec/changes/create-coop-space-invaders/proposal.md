@@ -27,11 +27,11 @@ Create an original, pixel-perfect cooperative Space Invaders browser game for on
 
 ### Modified Capabilities
 
-None in this newly initialized planning root. Template main specs and the server's existing/active changes remain separate sources; this proposal does not overwrite their accepted requirements. Server implementation must reconcile its own OpenSpec changes before editing shared modules.
+The inherited `babylon-lite-content`, `babylon-render-resolution`, and `source-organization-standards` capabilities are adapted to the fixed game, replacing showcase controls and generic folder names while preserving pixel-grid, resource lifecycle and UI/content separation contracts. Server implementation reconciles its own OpenSpec changes separately.
 
 ## Impact
 
-- Game repository: root package/Vite configuration, renamed `space-invaders/` application, template React shell and Babylon Lite adapters, tests, `docs/`, workflows, and version metadata. These files do not exist locally yet.
+- Game repository: root package/Vite configuration, renamed `space-invaders/` application, template React shell and Babylon Lite adapters, tests, `docs/`, workflows, and version metadata. These template files are established locally and implementation is in progress.
 - Shared server: `multiplayer-server/src/server.ts`, a new game-specific relay room, additive relay/client support, private admission routing, tests, package release assets, game registry, and README demo catalogs.
 - Observed dependencies: template `@babylonjs/lite@1.32.0`, React/Vite, Node 24; server/client version `0.9.9` with Colyseus SDK `0.17.43`. These are inspected source versions, not proof of a compatible published release.
 - User-confirmed host authority overrides the create-game skill's generic server-authority default. The user now requests interview, update and apply-with-Playwright; implementation follows the reconciled plan.

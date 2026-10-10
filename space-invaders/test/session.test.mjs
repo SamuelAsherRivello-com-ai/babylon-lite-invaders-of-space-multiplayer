@@ -57,3 +57,15 @@ test('guest acknowledgements discard committed actions while preserving pending 
   assert.deepEqual([...session.pending.keys()],[19,20]);
  }finally{session?.close();restore();}
 });
+
+test('same-time input changes replay elapsed time without multiplying predicted movement',()=>{
+ const restore=context();let session;
+ try{
+  const w=createWorld();applyAction(w,{sequence:1,sender:'pilot',type:'membership',payload:{number:1,connected:true}});startRun(w);w.players[0].x=100;
+  const client=new FakeClient({status:'connected',sessionId:'guest',hostId:'host',epoch:1,ready:true,runId:'r',seat:'pilot'});
+  session=new GameSession(client);session.predictedX=100;session.sequence=3;const at=performance.now()-20;
+  session.inputHistory=[1,2,3].map(sequence=>({sequence,at,move:1}));
+  client.emit('gameState',{transfer:{state:{state:packWorld(w),lastAppliedRelaySeq:1}}});
+  assert.ok(session.correction>2&&session.correction<4,'three simultaneous intents must replay about 20 ms, not 150 ms');
+ }finally{session?.close();restore();}
+});

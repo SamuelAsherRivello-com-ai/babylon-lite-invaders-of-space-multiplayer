@@ -6,7 +6,7 @@ Thank you for improving this project.
 
 Review `README.md`, `AGENTS.md`, and the project's actual configuration first.
 For the baseline, the repository root holds the npm dependencies and project
-commands; application files live in `project-name/`. Keep repository metadata
+commands; application files live in `space-invaders/`. Keep repository metadata
 at the root.
 
 For a substantial feature or behavior change, use the configured OpenSpec
@@ -28,3 +28,4 @@ verification evidence consistent with one another.
 Describe the user-visible outcome, the checks performed, any manual evidence,
 documentation changes, and relevant OpenSpec change identifier. Call out new
 dependencies, configuration changes, and release implications.
+
