@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@babylonjs/lite": "1.32.0",
+    "@rmc/multiplayer-client": "https://github.com/SamuelAsherRivello/rmc-colyseus-multiplayer-server/releases/download/v0.9.12/rmc-multiplayer-client-0.9.12.tgz",
     "@vitejs/plugin-react": "^6.1.1",
     "react": "^19.3.0",
     "react-dom": "^19.3.0"

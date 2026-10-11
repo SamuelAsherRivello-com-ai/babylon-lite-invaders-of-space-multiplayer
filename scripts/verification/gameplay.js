@@ -2,7 +2,7 @@ async (page) => {
   await page.evaluate(()=>{window.__browserEvidence=null;window.__browserProgress='Starting verification';});
   const browser=page.context().browser(),url='http://127.0.0.1:5185/babylon-lite-space-invaders-clone/';
   const contexts=[],errors=[];let pilots=[];
-  const open=async(room)=>{const c=await browser.newContext({viewport:{width:1280,height:720}});contexts.push(c);await c.addInitScript(()=>Object.defineProperty(document,'hidden',{configurable:true,get:()=>false}));const p=await c.newPage();p.on('pageerror',e=>errors.push(e.message));await p.goto(url+(room?'?room='+room:''));await p.locator('.game-overlay').waitFor();return p;};
+  const open=async(room)=>{const c=await browser.newContext({viewport:{width:1280,height:720}});contexts.push(c);await c.addInitScript(()=>Object.defineProperty(document,'hidden',{configurable:true,get:()=>false}));const p=await c.newPage();p.on('pageerror',e=>errors.push(e.message));p.on('response',r=>{const u=new URL(r.url());if(r.status()>=400&&u.origin===new URL(url).origin&&/\.(?:js|css|png|svg)$/.test(u.pathname))errors.push('Asset HTTP '+r.status()+': '+u.pathname);});await p.goto(url+(room?'?room='+room:''));await p.locator('.game-overlay').waitFor();return p;};
   const inspect=p=>p.evaluate(()=>window.__inspectInvaders?.());
   const until=async(fn,label,ms=20000)=>{const end=Date.now()+ms;while(!await fn()){if(Date.now()>end)throw Error(label);await new Promise(r=>setTimeout(r,30));}};
   const keys=async(p,move,fire)=>p.evaluate(({move,fire})=>{for(const [key,held] of [['ArrowLeft',move<0],['ArrowRight',move>0],[' ',fire]])window.dispatchEvent(new KeyboardEvent(held?'keydown':'keyup',{key,bubbles:true,cancelable:true}));},{move,fire});

@@ -16,7 +16,7 @@
 
 Microsoft Edge uses hardware WebGPU on Intel Gen-12LP; `isFallbackAdapter` is false. The actual renderer and lobby were inspected at 1280×720. A separate mobile-emulated context at 390×844 and DPR 2 displayed the complete portrait lobby without scrolling and opened/closed settings. A separate context with WebGPU disabled showed the graphics guidance and retry control, with settings still usable.
 
-Physical touch devices have not been tested. Touch emulation and independent-pointer unit tests do not prove physical-device compatibility. Public release verification remains pending.
+Physical touch devices have not been tested. Touch emulation and independent-pointer unit tests do not prove physical-device compatibility. Public frontend verification is recorded separately below.
 
 Resize verification in Edge confirmed 640×1152 at integer 2× for a 1920×1200 window; proportional 266.66×480 CSS fit for 320×480; and 320×576 at 1× for 1280×720. A simulated DPR change from 1 to 1.5 changed backing width from 320 to 480 once. Fullscreen entry/exit through settings succeeded. These checks preserve fixed world framing; physical fractional-DPR displays and physical touch hardware remain untested.
 
@@ -40,7 +40,7 @@ An intentionally stalled adapter request produced the graphics timeout/retry sta
 
 ## Reproduce browser verification
 
-The checked-in callbacks use Playwright CLI with a headed WebGPU-capable browser. Start the local game on the recorded port before local checks. The callbacks open independent browser contexts, drive actual controls, and close their own contexts. Local gameplay inspection is read-only and omitted from production.
+The checked-in callbacks use Playwright CLI with a headed WebGPU-capable browser. Start the local game with `npm run dev -- --host 127.0.0.1 --port 5185 --strictPort` before local checks. The callbacks open independent browser contexts, drive actual controls, and close their own contexts. Local gameplay inspection is read-only and omitted from production.
 
 ```sh
 playwright-cli -s=invaders open about:blank --browser=msedge --headed
@@ -60,3 +60,5 @@ The public two-client callback observes received WebSocket frames without a prod
 Before publication, this passive-observation callback passed the complete loop against the staged relay using the local browser client in 78.130 seconds. Living-host and spectator-host handoffs took 3.366 and 2.911 seconds, respectively. Both clients agreed on the new run, wave one, score zero, combat phase and restored lives. This establishes the verifier's behavior; it does not claim the GitHub Pages deployment has been tested yet.
 
 Shared-server release run `38084815998` passed all local checks but encountered intermittent public Bomberman, Combat and Ring Rivals failures. A focused repeat against its same staged deployment passed all four affected integration tests. The deployment gate now retains both attempt logs and permits one failed-test rerun; every assertion must pass before promotion. A permanent-failure fixture verified that rerunning cannot turn an enduring assertion failure into success. No assertion or compatibility test was removed.
+
+On October 11, 2026 (UTC), the published v0.9.12 client artifact was installed from its exact GitHub release URL. Fresh installation reported zero audit vulnerabilities; all 31 game tests and the production build passed under Node 24. The stable production relay reported v0.9.12. Its game-specific protocol check passed in 21.078 seconds, and its 240-second session probe passed with checkpoint tick 239 and successful migration. The passive browser verifier, using this released client against that production relay, passed in 78.160 seconds with no page or asset errors; living and spectator host handoffs took 3.331 and 2.608 seconds. This run used the local frontend; the deployed frontend is checked after publication.

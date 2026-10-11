@@ -42,6 +42,8 @@ Vite serves the app beneath `/babylon-lite-space-invaders-clone/`; the productio
 
 The host browser simulates the world at 60 Hz. The [shared Colyseus server](https://github.com/SamuelAsherRivello/rmc-colyseus-multiplayer-server) handles private admission, ordered actions, checkpoints, and host election. It does not simulate movement, combat, lives, or waves. Every pilot predicts local movement; guests interpolate remote snapshots. Authoritative outcomes always come from the participant host.
 
+The game pins [shared client v0.9.12](https://github.com/SamuelAsherRivello/rmc-colyseus-multiplayer-server/releases/tag/v0.9.12) through its exact release tarball and lockfile integrity. The production relay is `https://rmc-colyseus-multiplayer-server.vercel.app`. An optional `VITE_MULTIPLAYER_ENDPOINT` override accepts a secure relay origin; insecure HTTP is restricted to local development origins.
+
 Intentional departure frees a seat. A dropped connection reserves it for fifteen seconds. Rejoining with the private token restores the same life record, including elimination; it does not grant extra lives. Spectators occupy a seat and can host the simulation. Browser storage loss loses anonymous identity proof. Rooms expire fifteen seconds after the last connection leaves.
 
 Host departure or missed heartbeats elects a successor, which restores the committed world and pending ordered actions before resuming. Hidden tabs yield host eligibility. A missing checkpoint or exhausted journal produces a visible recovery error. Rejoining an expired room requires creating a new room.
