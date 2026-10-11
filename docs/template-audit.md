@@ -42,10 +42,10 @@ This records outcomes for `AGENTS_TEMPLATE_USAGE_CHECKLIST.md`; inherited instru
 | Active versus accepted specifications | Verified during implementation: active game change, synchronized applicable template deltas; final game sync/archive tracked separately. |
 | 5: Search stale names and placeholders | Verified: active paths renamed; historical examples, imported skills and reusable checklist strings deliberately retained and explained. |
 | Run documented local and authorized delivery checks | Local checks verified; public release evidence tracked in `verification.md`. |
-| Verify README links, commands, imagery and packages | Reviewed against actual project; final release package and public demo remain delivery gates until verified. |
+| Verify README links, commands, imagery and packages | Verified: exact released SDK, game v0.0.9, public demo and actual screenshots; see `verification.md`. |
 | Original prompt URL | Unverified: no source URL supplied; no invented link. |
 | About metadata | Verified through GitHub API after update. |
 | Report checklist outcomes | Verified: this table identifies verified, conditional and unverified items. |
-| Ready status | Local gameplay verified; final ready status depends on public release and delivery gates. |
+| Ready status | Ready: public v0.0.9 cooperative loop and production relay verified; physical-device limits disclosed. |
 
 The twelve scorecard questions are satisfied by the renamed app, correct Vite configuration, resolved active placeholders, actual README, real commands, adapted template artifacts, four corners, one orientation, silent audio policy, nonconflicting shell shortcuts, correct ignores and disclosed verification limits. Conditional audio support is satisfied by deliberately omitting sound. Final delivery status is recorded separately rather than inferred from this scorecard.

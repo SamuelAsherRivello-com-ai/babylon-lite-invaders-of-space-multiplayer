@@ -66,8 +66,8 @@ The user has authorized interview, update and apply-with-Playwright. D1-D3 are r
 
 ## 8. Release, verify publicly and finalize after implementation
 
-- [ ] 8.1 Commit/push only scoped game changes on the default branch and invoke the inspected game Release workflow. Verify its checks, generated version commit, tag and release; never create a pull request or force-push as a side effect.
-- [ ] 8.2 Deploy the intended release through Pages, dispatching the workflow explicitly if needed. Verify public subpath assets, displayed version, connection to the recorded relay and a public two-client full-loop/migration smoke test; do not equate deployment status with playable success.
+- [x] 8.1 Commit/push only scoped game changes on the default branch and invoke the inspected game Release workflow. Verify its checks, generated version commit, tag and release; never create a pull request or force-push as a side effect.
+- [x] 8.2 Deploy the intended release through Pages, dispatching the workflow explicitly if needed. Verify public subpath assets, displayed version, connection to the recorded relay and a public two-client full-loop/migration smoke test; do not equate deployment status with playable success.
 - [x] 8.3 Verify the actual production session-duration/reconnect contract selected in D4 and repeat affected shared-game compatibility probes. Record remaining hosting/device limits and keep any unmet acceptance requirement unchecked.
 - [ ] 8.4 Fetch and fast-forward both game and server checkouts to include release-generated commits. Verify clean task-related status, local/remote alignment and separate game/server release evidence without discarding unrelated work.
 - [ ] 8.5 When implementation acceptance is actually met, use the applicable OpenSpec sync/archive/finalization workflow and return verified playable/repository/release links and checkout paths. Verify no task is marked complete merely because its artifact exists or deployment job is green.

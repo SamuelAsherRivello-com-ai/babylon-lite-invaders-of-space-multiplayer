@@ -6,7 +6,9 @@ A pixel-art invasion game for one to four pilots. Hold the line against descendi
 
 ## Live Demo
 
-Publication is in progress. The multiplayer relay must pass its free Vercel Hobby deployment checks before the game is released to GitHub Pages.
+[Play Space Invaders — Cooperative Defense](https://samuelasherrivello.github.io/babylon-lite-space-invaders-clone/) · [Game release v0.0.9](https://github.com/SamuelAsherRivello/babylon-lite-space-invaders-clone/releases/tag/v0.0.9)
+
+One to four players, with the participant host simulating the world through the existing free Vercel Hobby relay. Requires WebGPU. [Verification and hosting limits](docs/verification.md).
 
 ## Play
 
