@@ -8,7 +8,7 @@ A pixel-art invasion game for one to four pilots. Hold the line against descendi
 
 ## Live Demo
 
-[Play Invaders of Space](https://samuelasherrivello.github.io/babylon-lite-invaders-of-space-multiplayer/) · [Game release v0.0.9](https://github.com/SamuelAsherRivello/babylon-lite-invaders-of-space-multiplayer/releases/tag/v0.0.9)
+[Play Invaders of Space](https://samuelasherrivello-com-ai.github.io/babylon-lite-invaders-of-space-multiplayer/) · [Game release v0.0.9](https://github.com/SamuelAsherRivello-com-ai/babylon-lite-invaders-of-space-multiplayer/releases/tag/v0.0.9)
 
 One to four players, with the participant host simulating the world through the existing free Vercel Hobby relay. Requires WebGPU. [Verification and hosting limits](docs/verification.md).
 
