@@ -1,4 +1,6 @@
-# Space Invaders — Cooperative Defense
+# Invaders of Space
+
+[![Invaders of Space logo above four colorful fighters and descending pixel aliens](docs/images/game-logo.png)](docs/game-branding.md)
 
 A pixel-art invasion game for one to four pilots. Hold the line against descending alien waves, share the sky, and survive on three personal lives.
 
@@ -6,7 +8,7 @@ A pixel-art invasion game for one to four pilots. Hold the line against descendi
 
 ## Live Demo
 
-[Play Space Invaders — Cooperative Defense](https://samuelasherrivello.github.io/babylon-lite-space-invaders-clone/) · [Game release v0.0.9](https://github.com/SamuelAsherRivello/babylon-lite-space-invaders-clone/releases/tag/v0.0.9)
+[Play Invaders of Space](https://samuelasherrivello.github.io/babylon-lite-invaders-of-space-multiplayer/) · [Game release v0.0.9](https://github.com/SamuelAsherRivello/babylon-lite-invaders-of-space-multiplayer/releases/tag/v0.0.9)
 
 One to four players, with the participant host simulating the world through the existing free Vercel Hobby relay. Requires WebGPU. [Verification and hosting limits](docs/verification.md).
 
