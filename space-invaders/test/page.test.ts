@@ -5,16 +5,16 @@ import test from 'node:test';
 import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { createServer } from 'vite';
-import viteConfig from '../../vite.config.js';
+import viteConfig from '../../vite.config.ts';
 import { defaultLayout, fitViewport, validateLayout } from '../src/ui/layout.js';
 
 test('keeps npm/application and GitHub Pages roots', () => {
   assert.equal(viteConfig.root, 'space-invaders');
-  assert.equal(viteConfig.base, '/babylon-lite-space-invaders-clone/');
+  assert.equal(viteConfig.base, "/babylon-lite-invaders-of-space-multiplayer/");
 });
 test('fits orientations and project-defined ratios in CSS pixels', () => {
   for (const layout of [defaultLayout, {orientation:'portrait',width:9,height:16}, {orientation:'square',width:1,height:1}, {orientation:'landscape',width:7,height:3}]) {
-    for (const [w,h] of [[1600,900],[400,900],[800,800],[160,100]]) {
+    for (const [w,h] of [[1600,900],[400,900],[800,800],[160,100]] as const) {
       const fit = fitViewport(w,h,layout);
       assert.ok(fit.width <= w && fit.height <= h + 1e-9);
       assert.ok(Math.abs(fit.width/fit.height - layout.width/layout.height) < 1e-9);
@@ -32,7 +32,7 @@ test('invalid dimensions and orientation give actionable errors', () => {
   assert.deepEqual(fitViewport(0,0,defaultLayout), {width:0,height:0,x:0,y:0});
 });
 test('preserves corner contracts and engine-neutral content-layer guidance', async () => {
-  const read = name => readFile(new URL('../'+name,import.meta.url),'utf8');
+  const read = (name: string) => readFile(new URL('../'+name,import.meta.url),'utf8');
   const [app,surface,main,html,guide] = await Promise.all([read('src/ui/App.jsx'),read('src/ui/BrowserSurface.jsx'),read('src/main.jsx'),read('index.html'),read('../docs/layout-and-game-integration.md')]);
   assert.ok(main.includes('getElementById("root")'));
   assert.ok(html.includes('id="root"'));
@@ -47,7 +47,7 @@ test('preserves corner contracts and engine-neutral content-layer guidance', asy
   assert.doesNotMatch(surface,/import.*babylon/i);
 });
 test('keeps the UI and content source boundaries discoverable', async () => {
-  const read = name => readFile(new URL('../' + name, import.meta.url), 'utf8');
+  const read = (name: string) => readFile(new URL('../' + name, import.meta.url), 'utf8');
   const [main, content, standards] = await Promise.all([
     read('src/main.jsx'),
     read('src/content/Content.jsx'),
@@ -75,7 +75,7 @@ test('renders the shell without a presentation and with a stub presentation', as
   });
 
   const server = await createServer({
-    configFile: fileURLToPath(new URL('../../vite.config.js', import.meta.url)),
+    configFile: fileURLToPath(new URL('../../vite.config.ts', import.meta.url)),
     server: { middlewareMode: true },
     appType: 'custom',
   });
@@ -99,9 +99,9 @@ test('renders the shell without a presentation and with a stub presentation', as
   } finally {
     await server.close();
     if (priorWindow) Object.defineProperty(globalThis, 'window', priorWindow);
-    else delete globalThis.window;
+    else Reflect.deleteProperty(globalThis, "window");
     if (priorStorage) Object.defineProperty(globalThis, 'localStorage', priorStorage);
-    else delete globalThis.localStorage;
+    else Reflect.deleteProperty(globalThis, "localStorage");
   }
 });
 
