@@ -1,5 +1,6 @@
 import { useLayoutEffect, useRef, useState } from "react";
 import { defaultLayout, fitViewport, validateLayout } from "./layout.js";
+import { fitPresentationFrame } from "./presentation.js";
 
 function rectangle(x, y, width, height) {
   return { left: x, top: y, width, height };
@@ -8,6 +9,23 @@ function rectangle(x, y, width, height) {
 export function BrowserSurface({ layout = defaultLayout, children, ui, gutters = {}, onViewportResize }) {
   const surfaceRef = useRef(null);
   const [size, setSize] = useState({ width: 0, height: 0 });
+  const [fullscreen, setFullscreen] = useState(() => typeof document !== "undefined" && Boolean(document.fullscreenElement));
+  const [screenSize, setScreenSize] = useState(() => ({
+    width: typeof window === "undefined" ? 0 : window.innerWidth,
+    height: typeof window === "undefined" ? 0 : window.innerHeight,
+  }));
+  useLayoutEffect(() => {
+    const sync = () => {
+      setFullscreen(Boolean(document.fullscreenElement));
+      setScreenSize({ width: window.innerWidth, height: window.innerHeight });
+    };
+    window.addEventListener("resize", sync);
+    document.addEventListener("fullscreenchange", sync);
+    return () => {
+      window.removeEventListener("resize", sync);
+      document.removeEventListener("fullscreenchange", sync);
+    };
+  }, []);
   useLayoutEffect(() => {
     const surface = surfaceRef.current;
     const measure = () => setSize({ width: surface.clientWidth, height: surface.clientHeight });
@@ -31,6 +49,8 @@ export function BrowserSurface({ layout = defaultLayout, children, ui, gutters =
 
   let error;
   try { validateLayout(layout); } catch (failure) { error = failure.message; }
+  const frame = fullscreen ? fitPresentationFrame(screenSize.width, screenSize.height) : null;
+  const surfaceStyle = frame ? { width: `${frame.width}px`, height: `${frame.height}px` } : undefined;
   const viewport = error ? null : fitViewport(size.width, size.height, layout);
   const regions = viewport && {
     top: rectangle(0, 0, size.width, viewport.y),
@@ -40,22 +60,24 @@ export function BrowserSurface({ layout = defaultLayout, children, ui, gutters =
   };
 
   return (
-    <div ref={surfaceRef} id="browser_surface" style={layout.gutterBackground ? { "--gutter-color": layout.gutterBackground } : undefined}>
-      {error ? <div className="layout_error" role="alert">{error}</div> : <>
-        {Object.entries(regions).map(([side, style]) => (
-          <div key={side} className={`gutter gutter_${side}`} style={style}>
-            {gutters[side]}
-            {(side === "left" || side === "right") && <span className="gutter-border" aria-hidden="true" />}
+    <div className="surface-shell">
+      <div ref={surfaceRef} id="browser_surface" style={{ ...surfaceStyle, ...(layout.gutterBackground ? { "--gutter-color": layout.gutterBackground } : {}) }}>
+        {error ? <div className="layout_error" role="alert">{error}</div> : <>
+          {Object.entries(regions).map(([side, style]) => (
+            <div key={side} className={`gutter gutter_${side}`} style={style}>
+              {gutters[side]}
+              {(side === "left" || side === "right") && <span className="gutter-border" aria-hidden="true" />}
+            </div>
+          ))}
+          <div id="viewport" data-orientation={layout.orientation} style={{ ...rectangle(viewport.x, viewport.y, viewport.width, viewport.height), "--project-viewport-width": `${viewport.width}px`, "--project-viewport-height": `${viewport.height}px` }}>
+            {/* Selected content mounts beneath the independent UI layer. Content and renderer
+                integrations own their backing resolution and lifecycle while the viewport stays
+                in CSS pixels. See the integration guide for current renderer examples. */}
+            <div id="content_layer">{children}</div>
+            <div id="ui_layer">{ui}</div>
           </div>
-        ))}
-        <div id="viewport" data-orientation={layout.orientation} style={{ ...rectangle(viewport.x, viewport.y, viewport.width, viewport.height), "--project-viewport-width": `${viewport.width}px`, "--project-viewport-height": `${viewport.height}px` }}>
-          {/* Selected content mounts beneath the independent UI layer. Content and renderer
-              integrations own their backing resolution and lifecycle while the viewport stays
-              in CSS pixels. See the integration guide for current renderer examples. */}
-          <div id="content_layer">{children}</div>
-          <div id="ui_layer">{ui}</div>
-        </div>
-      </>}
+        </>}
+      </div>
     </div>
   );
 }
