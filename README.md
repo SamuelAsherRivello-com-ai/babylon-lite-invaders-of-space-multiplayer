@@ -40,7 +40,7 @@ npm run dev
 npm run build
 ```
 
-Vite serves the app beneath `/babylon-lite-space-invaders-clone/`; the production output is `space-invaders/dist/`. The checked-in Release workflow builds and tests before tagging. The Pages workflow publishes this output and root `version.txt`.
+Vite serves the app beneath `/babylon-lite-invaders-of-space-multiplayer/`; the production output is `space-invaders/dist/`. The checked-in Release workflow builds and tests before tagging. The Pages workflow publishes this output and root `version.txt`.
 
 ## Multiplayer
 

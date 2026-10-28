@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { GameCanvas } from './game/GameCanvas.jsx';
 import { GameSession } from './game/session.js';
 import { InputController } from './game/input.js';
@@ -9,9 +10,11 @@ import { useContentShell } from '../shared/ContentShellContext.jsx';
 export function Content({ createClient }) {
   const session=useRef(null),mounted=useRef(false),joining=useRef(false);
   const [,refresh]=useState(0),[graphics,setGraphics]=useState(false),[notice,setNotice]=useState('');
+  const [gutterTargets,setGutterTargets]=useState(null);
   const linked=new URLSearchParams(location.search).get('room')?.trim().toUpperCase()||'';
   const [code,setCode]=useState(linked);
   const {paused}=useContentShell();
+  useEffect(()=>{setGutterTargets({left:document.getElementById('gutter_left'),right:document.getElementById('gutter_right')});},[]);
   const preview=useMemo(()=>{const w=createWorld();formation(w);return w;},[]);
   const input=useMemo(()=>new InputController(value=>{session.current?.setIntent(value);if(mounted.current)refresh(n=>n+1);}),[]);
   useEffect(()=>{
@@ -45,11 +48,24 @@ export function Content({ createClient }) {
   function leave(){input.release();current?.close();session.current=null;setNotice('');refresh(n=>n+1);const url=new URL(location.href);url.searchParams.delete('room');history.replaceState(null,'',url);}
   async function share(){const url=new URL(location.href);url.searchParams.set('room',state.code);try{await navigator.clipboard.writeText(url.toString());setNotice('Invite link copied.');}catch{setNotice('Share this room code: '+state.code);}}
   const active=connected&&state.ready&&!current.error;
+  const crew=[1,2,3,4].map(number=>{const p=world.players.find(p=>p.number===number&&p.connected)||world.players.find(p=>p.number===number);return {number,player:p,label:p&&p.id===state?.seat?'YOU':'PILOT '+number,lives:p?('♥'.repeat(p.lives)||'OUT'):'— — —'};});
+  const gutterStatus=graphics&&gutterTargets&&<>
+    {createPortal(<div className="gutter-status gutter-status-left" role="group" aria-label="Wave and crew status">
+      <div className="gutter-stat">WAVE<span className="gutter-stat-number">{String(world.wave).padStart(2,'0')}</span></div>
+      {connected&&<div className="gutter-stat gutter-stat-muted">{world.aliens.length} ALIENS<span className="gutter-stat-caption">{current.isHost?'YOU HOST':'COOPERATIVE'}</span></div>}
+      <div className="gutter-crew">{crew.map(({number,player,label,lives})=><div key={number} className={'gutter-crew-seat'+(!player?.connected?' offline':'')} style={{'--pilot-color':COLORS[number-1]}}><span>{label}</span><em>{lives}</em></div>)}</div>
+    </div>,gutterTargets.left)}
+    {createPortal(<div className="gutter-status gutter-status-right" role="group" aria-label="Score and room status">
+      <div className="gutter-stat gutter-stat-right">TEAM SCORE<span className="gutter-stat-number">{String(world.score).padStart(5,'0')}</span></div>
+      {connected&&<div className="gutter-stat gutter-stat-muted gutter-stat-right">{world.players.filter(p=>p.connected).length}/4 PILOTS<span className="gutter-stat-caption">ROOM {state.code}</span></div>}
+    </div>,gutterTargets.right)}
+  </>;
   return <>
+    {gutterStatus}
     <GameCanvas getFrame={()=>session.current?.getFrame()||preview} onReady={setGraphics}/>
     {graphics&&<div className="game-overlay" data-phase={world.phase} data-wave={world.wave} data-score={world.score} data-run={world.run} data-host={current?.isHost?'true':'false'} data-status={state?.status||'idle'}>
       <div className="game-hud"><div>WAVE<span className="hud-number">{String(world.wave).padStart(2,'0')}</span></div><div className="hud-right">TEAM SCORE<span className="hud-number">{String(world.score).padStart(5,'0')}</span></div></div>
-      <div className="crew-strip">{[1,2,3,4].map(number=>{const p=world.players.find(p=>p.number===number&&p.connected)||world.players.find(p=>p.number===number);return <div key={number} className={'crew-seat'+(!p?.connected?' offline':'')} style={{'--pilot-color':COLORS[number-1]}} data-player={number} data-lives={p?.lives??''} data-connected={Boolean(p?.connected)}>{p&&p.id===state?.seat?'YOU':'PILOT '+number}<em>{p?('♥'.repeat(p.lives)||'OUT'):'— — —'}</em></div>;})}</div>
+      <div className="crew-strip">{crew.map(({number,player:p,label,lives})=><div key={number} className={'crew-seat'+(!p?.connected?' offline':'')} style={{'--pilot-color':COLORS[number-1]}} data-player={number} data-lives={p?.lives??''} data-connected={Boolean(p?.connected)}>{label}<em>{lives}</em></div>)}</div>
       {connected&&<div className="hud-live">{world.aliens.length} ALIENS · {current.isHost?'YOU HOST':'COOPERATIVE'} · {world.players.filter(p=>p.connected).length}/4</div>}
       {!current&&<div className="game-panel"><div className="eyebrow">ONE SKY. FOUR PILOTS.</div><h1>HOLD THE<br/>LINE.</h1><p>Stop the descending invasion together.<br/>Three lives each. Endless waves.</p><button className="primary" disabled={!createClient} onClick={()=>void join(true)}>CREATE ROOM</button><form className="code-row" onSubmit={e=>{e.preventDefault();void join(false);}}><input aria-label="Room code" placeholder="CODE" maxLength={4} value={code} onChange={e=>{setCode(e.target.value.toUpperCase().replace(/[^A-Z0-9]/g,''));setNotice('');}}/><button type="submit" disabled={!createClient}>JOIN</button></form><p>A / D or ← / → to move · Space to fire<br/>Or use the controls below.</p>{notice&&<p className="error-text" role="status">{notice}</p>}</div>}
       {current&&!connected&&<div className="game-panel"><div className="eyebrow">FLIGHT CONTROL</div><h2>{state.status==='full'?'Room full':state.status==='error'?'Unable to join':'Connecting…'}</h2><p role="status">{error||'Contacting the relay.'}</p>{['error','full'].includes(state.status)&&<button className="primary" onClick={()=>void join(false,state.code||code)}>RETRY</button>}<button className="secondary" onClick={leave}>RETURN TO LOBBY</button></div>}

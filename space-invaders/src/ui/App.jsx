@@ -38,9 +38,9 @@ export function App({ layout = defaultLayout, content = null, contentPresentatio
   const Readout = contentPresentation?.Readout;
   const Settings = contentPresentation?.Settings;
   return <ContentShellProvider paused={settings}>
-    <BrowserSurface layout={layout} onViewportResize={updateViewportPixels} gutters={gutters} ui={<>
-      <Corner position="top_left"><div className="corner-title">SPACE INVADERS<span className="corner-subtitle">COOPERATIVE DEFENSE</span></div></Corner>
-      <Corner position="top_right"><a className="corner-body" href="https://github.com/SamuelAsherRivello/babylon-lite-space-invaders-clone" target="_blank" rel="noopener noreferrer" aria-label="Game source on GitHub">SOURCE ↗</a></Corner>
+    <BrowserSurface layout={layout} onViewportResize={updateViewportPixels} gutters={gutters} forceCompactGutters={isFullscreen} ui={<>
+      <Corner position="top_left"><div className="corner-title">SPACE INVADERS<span className="corner-subtitle">INVADERS OF SPACE</span></div></Corner>
+      <Corner position="top_right"><a className="corner-body" href="https://github.com/SamuelAsherRivello-com-ai/babylon-lite-invaders-of-space-multiplayer" target="_blank" rel="noopener noreferrer" aria-label="Game source on GitHub">SOURCE ↗</a></Corner>
       <Corner position="bottom_left"><button className="corner_option" onClick={() => setSettings(true)}>⚙ SETTINGS</button></Corner>
       <Corner position="bottom_right"><div className="corner-body">v{versionNumber}</div>{Readout && <Readout hudVisible={false} viewportPixels={viewportPixels} devicePixelRatio={window.devicePixelRatio || 1} openSettings={() => setSettings(true)} />}</Corner>
       {settings && <Dialog title="Settings" onClose={() => setSettings(false)}>

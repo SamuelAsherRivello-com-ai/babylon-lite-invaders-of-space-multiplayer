@@ -1,12 +1,12 @@
 import { useLayoutEffect, useRef, useState } from "react";
-import { defaultLayout, fitViewport, validateLayout } from "./layout.js";
+import { defaultLayout, fitViewport, getStatusLayout, validateLayout } from "./layout.js";
 import { fitPresentationFrame } from "./presentation.js";
 
 function rectangle(x, y, width, height) {
   return { left: x, top: y, width, height };
 }
 
-export function BrowserSurface({ layout = defaultLayout, children, ui, gutters = {}, onViewportResize }) {
+export function BrowserSurface({ layout = defaultLayout, children, ui, gutters = {}, onViewportResize, forceCompactGutters = false }) {
   const surfaceRef = useRef(null);
   const [size, setSize] = useState({ width: 0, height: 0 });
   const [fullscreen, setFullscreen] = useState(() => typeof document !== "undefined" && Boolean(document.fullscreenElement));
@@ -52,6 +52,7 @@ export function BrowserSurface({ layout = defaultLayout, children, ui, gutters =
   const frame = fullscreen ? fitPresentationFrame(screenSize.width, screenSize.height) : null;
   const surfaceStyle = frame ? { width: `${frame.width}px`, height: `${frame.height}px` } : undefined;
   const viewport = error ? null : fitViewport(size.width, size.height, layout);
+  const statusLayout = viewport && !forceCompactGutters ? getStatusLayout(viewport.x) : "compact";
   const regions = viewport && {
     top: rectangle(0, 0, size.width, viewport.y),
     bottom: rectangle(0, viewport.y + viewport.height, size.width, viewport.y),
@@ -64,12 +65,12 @@ export function BrowserSurface({ layout = defaultLayout, children, ui, gutters =
       <div ref={surfaceRef} id="browser_surface" style={{ ...surfaceStyle, ...(layout.gutterBackground ? { "--gutter-color": layout.gutterBackground } : {}) }}>
         {error ? <div className="layout_error" role="alert">{error}</div> : <>
           {Object.entries(regions).map(([side, style]) => (
-            <div key={side} className={`gutter gutter_${side}`} style={style}>
+            <div key={side} id={`gutter_${side}`} className={`gutter gutter_${side}`} data-status-layout={statusLayout} style={style}>
               {gutters[side]}
               {(side === "left" || side === "right") && <span className="gutter-border" aria-hidden="true" />}
             </div>
           ))}
-          <div id="viewport" data-orientation={layout.orientation} style={{ ...rectangle(viewport.x, viewport.y, viewport.width, viewport.height), "--project-viewport-width": `${viewport.width}px`, "--project-viewport-height": `${viewport.height}px` }}>
+          <div id="viewport" data-orientation={layout.orientation} data-status-layout={statusLayout} style={{ ...rectangle(viewport.x, viewport.y, viewport.width, viewport.height), "--project-viewport-width": `${viewport.width}px`, "--project-viewport-height": `${viewport.height}px` }}>
             {/* Selected content mounts beneath the independent UI layer. Content and renderer
                 integrations own their backing resolution and lifecycle while the viewport stays
                 in CSS pixels. See the integration guide for current renderer examples. */}

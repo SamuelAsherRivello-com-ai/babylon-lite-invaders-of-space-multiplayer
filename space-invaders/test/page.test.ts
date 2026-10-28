@@ -6,7 +6,7 @@ import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { createServer } from 'vite';
 import viteConfig from '../../vite.config.ts';
-import { defaultLayout, fitViewport, validateLayout } from '../src/ui/layout.js';
+import { defaultLayout, fitViewport, getStatusLayout, validateLayout } from '../src/ui/layout.js';
 
 test('keeps npm/application and GitHub Pages roots', () => {
   assert.equal(viteConfig.root, 'space-invaders');
@@ -23,6 +23,31 @@ test('fits orientations and project-defined ratios in CSS pixels', () => {
       assert.ok(fit.width>0 && fit.height>0);
     }
   }
+});
+test('uses external HUD only when both centered side gutters have enough room', () => {
+  assert.equal(getStatusLayout(159.99), 'compact');
+  assert.equal(getStatusLayout(160), 'wide');
+  assert.equal(getStatusLayout(320), 'wide');
+  assert.equal(getStatusLayout(Number.NaN), 'compact');
+  const narrow = fitViewport(600, 900, defaultLayout);
+  const wide = fitViewport(1200, 900, defaultLayout);
+  assert.equal(getStatusLayout(narrow.x), 'compact');
+  assert.equal(getStatusLayout(wide.x), 'wide');
+  assert.deepEqual(wide, { width: 504, height: 896, x: 348, y: 2 });
+});
+test('renders gutter status only for wide layouts and compacts in fullscreen', async () => {
+  const read = (name: string) => readFile(new URL('../' + name, import.meta.url), 'utf8');
+  const [surface, content, css, app, html] = await Promise.all([
+    read('src/ui/BrowserSurface.jsx'), read('src/content/Content.jsx'), read('src/ui/style.css'), read('src/ui/App.jsx'), read('index.html'),
+  ]);
+  assert.ok(surface.includes('id={`gutter_${side}`}'));
+  assert.ok(surface.includes('getStatusLayout(viewport.x)'));
+  assert.match(surface, /viewport && !forceCompactGutters/);
+  assert.match(content, /createPortal/);
+  assert.ok(css.includes('#gutter_left[data-status-layout="compact"]'));
+  assert.ok(css.includes('#viewport[data-status-layout="wide"] .game-hud'));
+  assert.ok(app.includes('forceCompactGutters={isFullscreen}'));
+  assert.match(html, /Invaders of Space/);
 });
 test('invalid dimensions and orientation give actionable errors', () => {
   for (const width of [0,-1,Infinity,NaN,'16']) assert.throws(() => validateLayout({...defaultLayout,width}), /finite positive/);

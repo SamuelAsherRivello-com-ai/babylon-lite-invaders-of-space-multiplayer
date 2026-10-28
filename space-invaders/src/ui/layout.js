@@ -11,6 +11,14 @@ export const defaultLayout = Object.freeze({
   integerFit: true,
 });
 
+export const GUTTER_STATUS_MIN_WIDTH = 160;
+
+export function getStatusLayout(sideGutterWidth) {
+  return Number.isFinite(sideGutterWidth) && sideGutterWidth >= GUTTER_STATUS_MIN_WIDTH
+    ? "wide"
+    : "compact";
+}
+
 export function validateLayout(layout) {
   const { width, height, orientation } = layout;
   if (![width, height].every((value) => Number.isFinite(value) && value > 0)) {
