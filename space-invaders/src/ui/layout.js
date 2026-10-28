@@ -7,8 +7,7 @@ export const aspectRatioPresets = Object.freeze({
 
 export const defaultLayout = Object.freeze({
   orientation: "portrait",
-  width: 320,
-  height: 576,
+  ...aspectRatioPresets.portrait,
   integerFit: true,
 });
 

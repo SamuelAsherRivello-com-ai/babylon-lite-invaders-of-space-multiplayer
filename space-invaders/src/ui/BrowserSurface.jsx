@@ -43,7 +43,10 @@ export function BrowserSurface({ layout = defaultLayout, children, ui, gutters =
     <div ref={surfaceRef} id="browser_surface" style={layout.gutterBackground ? { "--gutter-color": layout.gutterBackground } : undefined}>
       {error ? <div className="layout_error" role="alert">{error}</div> : <>
         {Object.entries(regions).map(([side, style]) => (
-          <div key={side} className={`gutter gutter_${side}`} style={style}>{gutters[side]}</div>
+          <div key={side} className={`gutter gutter_${side}`} style={style}>
+            {gutters[side]}
+            {(side === "left" || side === "right") && <span className="gutter-border" aria-hidden="true" />}
+          </div>
         ))}
         <div id="viewport" data-orientation={layout.orientation} style={{ ...rectangle(viewport.x, viewport.y, viewport.width, viewport.height), "--project-viewport-width": `${viewport.width}px`, "--project-viewport-height": `${viewport.height}px` }}>
           {/* Selected content mounts beneath the independent UI layer. Content and renderer
